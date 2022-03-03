@@ -1,0 +1,4 @@
+Keys(
+    nms_key: "A key with read access to your uISP setup",
+    nms_url: "Full URL of your UNMS up to /nms"
+)

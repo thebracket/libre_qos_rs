@@ -1,0 +1,11 @@
+[package]
+name = "libre_qos_rs"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[workspace]
+members = [
+    "uisp_integration",
+]
