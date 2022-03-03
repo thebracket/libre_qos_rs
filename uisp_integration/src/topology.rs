@@ -3,9 +3,9 @@ use crate::{
     unms::{nms_request_get_vec, Keys, Site},
 };
 use anyhow::Result;
-use std::{collections::HashMap, io::Read, path::Path};
 use std::fs::File;
 use std::io::Write;
+use std::{collections::HashMap, io::Read, path::Path};
 
 #[derive(Debug, Clone)]
 pub struct LqSite {
@@ -63,7 +63,10 @@ fn load_sites_csv() -> Result<HashMap<String, (usize, usize)>> {
                 let name = cols[0].trim();
                 let download = cols[1].trim();
                 let upload = cols[2].trim();
-                result.insert(name.to_string(), (download.parse().unwrap(), upload.parse().unwrap()));
+                result.insert(
+                    name.to_string(),
+                    (download.parse().unwrap(), upload.parse().unwrap()),
+                );
             }
         });
         Ok(result)
@@ -85,7 +88,10 @@ fn load_aps_csv() -> Result<HashMap<String, (usize, usize)>> {
                 let name = cols[0].trim();
                 let download = cols[1].trim();
                 let upload = cols[2].trim();
-                result.insert(name.to_string(), (download.parse().unwrap(), upload.parse().unwrap()));
+                result.insert(
+                    name.to_string(),
+                    (download.parse().unwrap(), upload.parse().unwrap()),
+                );
             }
         });
         Ok(result)
@@ -128,11 +134,12 @@ pub async fn build_topology(
                     if let Some(ap) = site.access_points.get_mut(&access_point) {
                         ap.clients.push(cpe.clone());
                     } else {
-                        let (download_mbps, upload_mbps) = if let Some(ap_info) = access_points_csv.get(&access_point) {
-                            (ap_info.0, ap_info.1)
-                        } else {
-                            (1_000, 1_000)
-                        };
+                        let (download_mbps, upload_mbps) =
+                            if let Some(ap_info) = access_points_csv.get(&access_point) {
+                                (ap_info.0, ap_info.1)
+                            } else {
+                                (1_000, 1_000)
+                            };
                         site.access_points.insert(
                             access_point.clone(),
                             LqAccessPoint {
@@ -161,7 +168,10 @@ pub async fn build_topology(
         for (_, ap) in site.access_points.iter() {
             acsv += &format!("{},{},{}\n", ap.name, ap.download_mbps, ap.upload_mbps);
         }
-        scsv += &format!("{},{},{}\n", site.name, site.download_mbps, site.upload_mbps);
+        scsv += &format!(
+            "{},{},{}\n",
+            site.name, site.download_mbps, site.upload_mbps
+        );
     }
     let mut f = File::create("AccessPoints.csv")?;
     f.write_all(acsv.as_bytes())?;
