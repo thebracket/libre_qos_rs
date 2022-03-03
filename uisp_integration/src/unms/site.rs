@@ -14,7 +14,7 @@ pub struct Site {
 }
 
 impl Site {
-    pub fn as_lq_site(&self) -> Option<LqSite> {
+    pub fn as_lq_site(&self, sites_csv: &HashMap<String, (usize, usize)>) -> Option<LqSite> {
         if !self.is_active() {
             return None;
         }
@@ -37,12 +37,19 @@ impl Site {
                 None
             };
             if let Some(name) = &ident.name {
+                let (download_mbps, upload_mbps) = if let Some(site_info) = sites_csv.get(name) {
+                    (site_info.0, site_info.1)
+                } else {
+                    (1_000, 1_000)
+                };
                 result = Some(LqSite {
                     id: self.id.clone(),
                     name: name.clone(),
                     parent,
                     children: Vec::new(),
                     access_points: HashMap::new(),
+                    download_mbps,
+                    upload_mbps,
                 });
             }
         }

@@ -1,5 +1,5 @@
-use serde::Deserialize;
 use crate::clients::LqClientDevice;
+use serde::Deserialize;
 
 #[allow(non_snake_case)]
 #[derive(Deserialize, Debug)]
@@ -48,7 +48,7 @@ pub struct DeviceAccessPoint {
 }
 
 impl Device {
-    pub fn as_lq_client_device(&self) -> Option<LqClientDevice> {
+    pub fn as_lq_client_device(&self, upload: usize, download: usize) -> Option<LqClientDevice> {
         let mut result = None;
         if self.identification.role == "ap" {
             return None;
@@ -84,6 +84,8 @@ impl Device {
                 access_point_name,
                 parent_site_id,
                 parent_site_name,
+                upload,
+                download,
             });
         }
         result
