@@ -81,9 +81,10 @@ fn strip_ip(ip: &str) -> String {
 }
 
 pub fn write_shaper_csv(clients: &[LqClientSite]) -> Result<()> {
-    let mut csv =
-        "ID,AP,MAC,Hostname,IPv4,IPv6,Download Min,Upload Min, Download Max, Upload Max\n"
-            .to_string();
+    //let mut csv =
+    //    "ID,AP,MAC,Hostname,IPv4,IPv6,Download Min,Upload Min, Download Max, Upload Max\n"
+    //        .to_string();
+    let mut csv = "deviceID, ParentNode, mac, hostname,ipv4, ipv6, downloadMin, uploadMin, downloadMax, uploadMax\n".to_string();
     clients.iter().for_each(|s| {
         s.devices.iter().for_each(|c| {
             // If QoS returned 0 for speed plan, change it to 1gbps.
@@ -91,15 +92,20 @@ pub fn write_shaper_csv(clients: &[LqClientSite]) -> Result<()> {
             let ul = if c.download == 0 { 1_000 } else { c.upload };
             let dl_mbps = dl / 1_000_000; // Convert to Mbps
             let ul_mbps = ul / 1_000_000;
+
+            let ap = if c.access_point_name.is_empty() {
+                format!("{}-NoAP", s.name.replace(",", "_"))
+            } else {
+                c.access_point_name.to_string()
+            };
+            let hostname = &c.hostname;
+            let ipv4 = strip_ip(&c.ip);
+            let ipv6 = "";
+            let device_id = "";
+            let mac = &c.mac;
+
             csv += &format!(
-                ",{},,{},{},,{},{},{},{}\n",
-                if c.access_point_name.is_empty() {
-                    format!("{}-NoAP", s.name)
-                } else {
-                    c.access_point_name.to_string()
-                },
-                c.hostname,
-                strip_ip(&c.ip),
+                "{device_id},{ap},{mac},{hostname},{ipv4},{ipv6},{},{},{},{}\n",
                 dl_mbps / 4,
                 ul_mbps / 4,
                 dl_mbps,

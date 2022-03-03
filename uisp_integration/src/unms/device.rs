@@ -60,7 +60,7 @@ impl Device {
             if let Some(attr) = &self.attributes {
                 if let Some(ap) = &attr.apDevice {
                     access_point_id = ap.id.clone();
-                    access_point_name = ap.name.clone();
+                    access_point_name = ap.name.replace(",", "_");
                 }
             }
 
@@ -76,7 +76,7 @@ impl Device {
 
             result = Some(LqClientDevice {
                 id: self.identification.id.clone(),
-                hostname: self.identification.hostname.clone(),
+                hostname: self.identification.hostname.replace(",", "_"),
                 mac: self.identification.mac.clone().unwrap_or(String::new()),
                 ip: ip.clone(),
                 model: self.identification.model.clone().unwrap_or(String::new()),

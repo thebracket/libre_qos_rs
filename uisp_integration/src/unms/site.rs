@@ -44,7 +44,7 @@ impl Site {
                 };
                 result = Some(LqSite {
                     id: self.id.clone(),
-                    name: name.clone(),
+                    name: name.replace(",", "_"),
                     parent,
                     children: Vec::new(),
                     access_points: HashMap::new(),

@@ -126,7 +126,7 @@ pub async fn build_topology(
             } else {
                 if let Some(site) = network_sites.get_mut(&cpe.parent_site_id) {
                     let access_point = if cpe.access_point_name.is_empty() {
-                        format!("{}-NoAP", cpe.parent_site_name)
+                        format!("{}-NoAP", cpe.parent_site_name.replace(",", "_"))
                     } else {
                         cpe.access_point_name.clone()
                     };
