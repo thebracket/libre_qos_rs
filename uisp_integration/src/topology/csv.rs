@@ -16,7 +16,10 @@ pub fn load_sites_csv() -> Result<HashMap<String, (usize, usize)>> {
                 let upload = cols[2].trim();
                 result.insert(
                     name.to_string(),
-                    (download.parse().unwrap(), upload.parse().unwrap()),
+                    (
+                        download.parse().unwrap_or(1_000),
+                        upload.parse().unwrap_or(1_000),
+                    ),
                 );
             }
         });

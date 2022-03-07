@@ -1,6 +1,6 @@
 use super::LqClientDevice;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LqClientSite {
     pub id: String,
     pub name: String,

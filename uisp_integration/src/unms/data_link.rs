@@ -12,6 +12,7 @@ pub struct DataLink {
 #[derive(Deserialize, Debug)]
 pub struct DataLinkFrom {
     pub device: DataLinkDevice,
+    pub site: Option<DataLinkSite>,
 }
 
 #[allow(non_snake_case)]
@@ -30,6 +31,7 @@ pub struct DataLinkDeviceIdentification {
 #[allow(non_snake_case)]
 #[derive(Deserialize, Debug)]
 pub struct DataLinkTo {
+    pub device: DataLinkDevice,
     pub site: Option<DataLinkSite>,
 }
 

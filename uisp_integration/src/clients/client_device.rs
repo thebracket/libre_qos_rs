@@ -11,4 +11,6 @@ pub struct LqClientDevice {
     pub parent_site_name: String,
     pub upload: usize,
     pub download: usize,
+    pub is_access_point: bool,
+    pub is_bridge: bool,
 }

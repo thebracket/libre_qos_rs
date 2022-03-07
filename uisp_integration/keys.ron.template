@@ -1,4 +1,5 @@
 Keys(
     nms_key: "A key with read access to your uISP setup",
-    nms_url: "Full URL of your UNMS up to /nms"
+    nms_url: "Full URL of your UNMS up to /nms",
+    "root_site_name" : "Site name as it appears in UISP at the root of the tree",
 )

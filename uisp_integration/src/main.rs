@@ -33,7 +33,15 @@ async fn main() -> Result<()> {
     println!("Fetched all uISP data in {:?}", start_fetch.elapsed());
 
     let mut network_sites = topology::build_site_list(&all_sites, &all_devices, &all_data_links)?;
-    let clients = clients::build_clients(&all_sites, &all_devices, &all_data_links)?;
+    //let clients = clients::build_clients(&all_sites, &all_devices, &all_data_links)?;
+    let mut clients = clients::single_entry_clients(&all_sites, &all_devices, &all_data_links)?;
+    let complex_clients = clients::complex_clients(
+        &all_sites,
+        &all_devices,
+        &all_data_links,
+        &mut network_sites,
+    )?;
+    clients.extend_from_slice(&complex_clients);
     write_shaper_csv(&clients)?;
     let network_map = build_topology(&clients, &mut network_sites)?;
     let network_json_data = NetworkNode::from_lq_site(&network_map);

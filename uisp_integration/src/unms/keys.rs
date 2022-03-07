@@ -8,6 +8,7 @@ use std::{fs::File, path::Path};
 pub struct Keys {
     nms_key: String,
     nms_url: String,
+    root_site_name: String,
 }
 
 impl Keys {
@@ -29,5 +30,9 @@ impl Keys {
 
     pub fn uisp(&self) -> (&str, &str) {
         (&self.nms_key, &self.nms_url)
+    }
+
+    pub fn root(&self) -> &str {
+        &self.root_site_name
     }
 }

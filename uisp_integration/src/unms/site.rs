@@ -79,6 +79,9 @@ impl Site {
 
     pub fn is_active(&self) -> bool {
         if let Some(id) = &self.identification {
+            if id.suspended {
+                return false;
+            }
             if let Some(status) = &id.status {
                 if status == "active" {
                     return true;
@@ -103,6 +106,7 @@ pub struct SiteId {
     pub site_type: Option<String>,
     pub parent: Option<SiteParent>,
     pub status: Option<String>,
+    pub suspended: bool,
 }
 
 #[allow(non_snake_case)]

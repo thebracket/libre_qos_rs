@@ -3,20 +3,20 @@ pub use site::*;
 mod access_point;
 pub use access_point::*;
 mod csv;
-mod promotion;
-use crate::unms::{DataLink, Device};
+use crate::unms::{DataLink, Device, Keys};
 use crate::{clients::LqClientSite, unms::Site};
 use anyhow::Result;
 pub use csv::*;
-pub use promotion::*;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
 
 pub fn build_site_tree(sites: &HashMap<String, LqSite>) -> Result<LqSite> {
+    let keys = Keys::load()?;
+    let root_name = keys.root();
     let mut root = sites
         .iter()
-        .find(|s| s.1.parent.is_none())
+        .find(|s| s.1.name == root_name)
         .unwrap()
         .1
         .clone();
@@ -29,15 +29,10 @@ pub fn build_site_list(
     all_devices: &[Device],
     all_data_links: &[DataLink],
 ) -> Result<HashMap<String, LqSite>> {
-    let promotion_list =
-        promote_client_sites_with_links_to_other_sites(all_sites, all_devices, all_data_links);
     let sites_csv = load_sites_csv()?;
     let sites = all_sites
         .iter()
         .filter(|s| {
-            if promotion_list.contains(&s.id) {
-                return true;
-            }
             if let Some(id) = &s.identification {
                 if let Some(site_type) = &id.site_type {
                     if site_type == "site" {
