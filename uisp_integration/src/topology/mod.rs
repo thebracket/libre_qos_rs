@@ -1,43 +1,14 @@
-use crate::{
-    clients::{LqClientDevice, LqClientSite},
-    unms::{nms_request_get_vec, Keys, Site},
-};
+mod site;
+pub use site::*;
+mod access_point;
+pub use access_point::*;
+mod csv;
+use crate::{clients::LqClientSite, unms::Site};
 use anyhow::Result;
+pub use csv::*;
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
-use std::{collections::HashMap, io::Read, path::Path};
-
-#[derive(Debug, Clone)]
-pub struct LqSite {
-    pub id: String,
-    pub name: String,
-    pub parent: Option<String>,
-    pub children: Vec<LqSite>,
-    pub access_points: HashMap<String, LqAccessPoint>,
-    pub download_mbps: usize,
-    pub upload_mbps: usize,
-}
-
-impl LqSite {
-    pub fn take_children(&mut self, sites: &HashMap<String, LqSite>) {
-        sites
-            .iter()
-            .filter(|s| s.1.parent.is_some() && s.1.parent.as_ref().unwrap() == &self.id)
-            .for_each(|s| {
-                let mut child = s.1.clone();
-                child.take_children(sites);
-                self.children.push(child)
-            });
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct LqAccessPoint {
-    pub name: String,
-    pub download_mbps: usize,
-    pub upload_mbps: usize,
-    pub clients: Vec<LqClientDevice>,
-}
 
 pub async fn build_site_tree(sites: &HashMap<String, LqSite>) -> Result<LqSite> {
     let mut root = sites
@@ -50,62 +21,20 @@ pub async fn build_site_tree(sites: &HashMap<String, LqSite>) -> Result<LqSite> 
     Ok(root)
 }
 
-fn load_sites_csv() -> Result<HashMap<String, (usize, usize)>> {
-    let path = Path::new("Sites.csv");
-    if path.exists() {
-        let mut result = HashMap::<String, (usize, usize)>::new();
-        let mut data = String::new();
-        let mut f = File::open(path)?;
-        f.read_to_string(&mut data)?;
-        data.split("\n").skip(1).for_each(|line| {
-            if !line.trim().is_empty() {
-                let cols = line.split(",").collect::<Vec<&str>>();
-                let name = cols[0].trim();
-                let download = cols[1].trim();
-                let upload = cols[2].trim();
-                result.insert(
-                    name.to_string(),
-                    (download.parse().unwrap(), upload.parse().unwrap()),
-                );
-            }
-        });
-        Ok(result)
-    } else {
-        Ok(HashMap::new())
-    }
-}
-
-fn load_aps_csv() -> Result<HashMap<String, (usize, usize)>> {
-    let path = Path::new("AccessPoints.csv");
-    if path.exists() {
-        let mut result = HashMap::<String, (usize, usize)>::new();
-        let mut data = String::new();
-        let mut f = File::open(path)?;
-        f.read_to_string(&mut data)?;
-        data.split("\n").skip(1).for_each(|line| {
-            if !line.trim().is_empty() {
-                let cols = line.split(",").collect::<Vec<&str>>();
-                let name = cols[0].trim();
-                let download = cols[1].trim();
-                let upload = cols[2].trim();
-                result.insert(
-                    name.to_string(),
-                    (download.parse().unwrap(), upload.parse().unwrap()),
-                );
-            }
-        });
-        Ok(result)
-    } else {
-        Ok(HashMap::new())
-    }
-}
-
-pub async fn build_site_list(keys: &Keys) -> Result<HashMap<String, LqSite>> {
+pub async fn build_site_list(all_sites: &[Site]) -> Result<HashMap<String, LqSite>> {
     let sites_csv = load_sites_csv()?;
-    let (key, url) = keys.uisp();
-    let sites = nms_request_get_vec::<Site>("sites?type=site", key, url)
-        .await?
+    let sites = all_sites
         .iter()
+        .filter(|s| {
+            if let Some(id) = &s.identification {
+                if let Some(site_type) = &id.site_type {
+                    if site_type == "site" {
+                        return true;
+                    }
+                }
+            }
+            false
+        })
         .filter_map(|s| s.as_lq_site(&sites_csv))
         .map(|s| (s.id.clone(), s))
         .collect::<HashMap<String, LqSite>>();

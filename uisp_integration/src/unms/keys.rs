@@ -1,7 +1,7 @@
-use anyhow::Result;
+use anyhow::{Error, Result};
 use ron::de::from_reader;
 use serde::{Deserialize, Serialize};
-use std::fs::File;
+use std::{fs::File, path::Path};
 
 /// Key store structure
 #[derive(Clone, Serialize, Deserialize, Default)]
@@ -12,6 +12,11 @@ pub struct Keys {
 
 impl Keys {
     pub fn load() -> Result<Self> {
+        let path = Path::new("keys.ron");
+        if !path.exists() {
+            return Err(Error::msg("Please setup keys.ron"));
+        }
+
         let f = File::open("keys.ron").unwrap();
         let mut keys: Self = from_reader(f)?;
         if keys.nms_url.ends_with("/") {

@@ -13,10 +13,10 @@ pub struct Device {
 #[derive(Deserialize, Debug)]
 pub struct DeviceIdentification {
     pub id: String,
-    pub hostname: String,
+    pub hostname: Option<String>,
     pub mac: Option<String>,
     pub model: Option<String>,
-    pub role: String,
+    pub role: Option<String>,
     pub site: Option<DeviceSite>,
 }
 
@@ -50,7 +50,11 @@ pub struct DeviceAccessPoint {
 impl Device {
     pub fn as_lq_client_device(&self, upload: usize, download: usize) -> Option<LqClientDevice> {
         let mut result = None;
-        if self.identification.role == "ap" {
+        if let Some(role) = &self.identification.role {
+            if role == "ap" {
+                return None;
+            }
+        } else {
             return None;
         }
         if let Some(ip) = &self.ipAddress {
@@ -74,9 +78,15 @@ impl Device {
                 }
             }
 
+            let hostname = if let Some(hn) = &self.identification.hostname {
+                hn.replace(",", "_")
+            } else {
+                String::new()
+            };
+
             result = Some(LqClientDevice {
                 id: self.identification.id.clone(),
-                hostname: self.identification.hostname.replace(",", "_"),
+                hostname,
                 mac: self.identification.mac.clone().unwrap_or(String::new()),
                 ip: ip.clone(),
                 model: self.identification.model.clone().unwrap_or(String::new()),
