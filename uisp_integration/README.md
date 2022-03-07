@@ -6,7 +6,7 @@ This project is designed to assist [LibreQOS](https://github.com/rchac/LibreQoS/
 
 ### Install Rust
 
-Go to [Rustup.rs](https://rustup.rs/) and install the Rust language and its handlers. You don't need any additional packages, beyond what Rust asks for.
+Go to [Rustup.rs](https://rustup.rs/) and install the Rust language and its handlers. You also need to install the `libssl-dev` package on Ubuntu with `sudo apt install libssl-dev`.
 
 ### Clone the repo
 
