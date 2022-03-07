@@ -34,6 +34,7 @@ async fn main() -> Result<()> {
 
     let mut network_sites = topology::build_site_list(&all_sites).await?;
     let clients = clients::build_clients(&all_sites, &all_devices, &all_data_links).await?;
+    println!("Found {} clients", clients.len());
     write_shaper_csv(&clients)?;
     let network_map = build_topology(&clients, &mut network_sites).await?;
     let network_json_data = NetworkNode::from_lq_site(&network_map);

@@ -33,10 +33,8 @@ pub async fn build_clients(
             .iter()
             .filter(|d| {
                 if let Some(site) = &d.identification.site {
-                    if let Some(parent) = &site.parent {
-                        if parent.id == client_site.id {
-                            return true;
-                        }
+                    if site.id == client_site.id {
+                        return true;
                     }
                 }
                 false

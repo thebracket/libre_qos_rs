@@ -23,6 +23,7 @@ pub struct DeviceIdentification {
 #[allow(non_snake_case)]
 #[derive(Deserialize, Debug)]
 pub struct DeviceSite {
+    pub id: String,
     pub parent: Option<DeviceParent>,
 }
 
@@ -54,8 +55,6 @@ impl Device {
             if role == "ap" {
                 return None;
             }
-        } else {
-            return None;
         }
         if let Some(ip) = &self.ipAddress {
             let mut access_point_id = String::new();
