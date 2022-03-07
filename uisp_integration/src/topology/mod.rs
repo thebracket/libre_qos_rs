@@ -3,14 +3,17 @@ pub use site::*;
 mod access_point;
 pub use access_point::*;
 mod csv;
+mod promotion;
+use crate::unms::{DataLink, Device};
 use crate::{clients::LqClientSite, unms::Site};
 use anyhow::Result;
 pub use csv::*;
+pub use promotion::*;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
 
-pub async fn build_site_tree(sites: &HashMap<String, LqSite>) -> Result<LqSite> {
+pub fn build_site_tree(sites: &HashMap<String, LqSite>) -> Result<LqSite> {
     let mut root = sites
         .iter()
         .find(|s| s.1.parent.is_none())
@@ -21,11 +24,20 @@ pub async fn build_site_tree(sites: &HashMap<String, LqSite>) -> Result<LqSite> 
     Ok(root)
 }
 
-pub async fn build_site_list(all_sites: &[Site]) -> Result<HashMap<String, LqSite>> {
+pub fn build_site_list(
+    all_sites: &[Site],
+    all_devices: &[Device],
+    all_data_links: &[DataLink],
+) -> Result<HashMap<String, LqSite>> {
+    let promotion_list =
+        promote_client_sites_with_links_to_other_sites(all_sites, all_devices, all_data_links);
     let sites_csv = load_sites_csv()?;
     let sites = all_sites
         .iter()
         .filter(|s| {
+            if promotion_list.contains(&s.id) {
+                return true;
+            }
             if let Some(id) = &s.identification {
                 if let Some(site_type) = &id.site_type {
                     if site_type == "site" {
@@ -41,7 +53,7 @@ pub async fn build_site_list(all_sites: &[Site]) -> Result<HashMap<String, LqSit
     Ok(sites)
 }
 
-pub async fn build_topology(
+pub fn build_topology(
     clients: &[LqClientSite],
     network_sites: &mut HashMap<String, LqSite>,
 ) -> Result<LqSite> {
@@ -116,7 +128,7 @@ pub async fn build_topology(
     f.write_all(pcsv.as_bytes())?;
 
     // Overall topology
-    let mut network_map = build_site_tree(&network_sites).await?;
+    let mut network_map = build_site_tree(&network_sites)?;
     network_map.access_points.insert(
         "0".to_string(),
         LqAccessPoint {

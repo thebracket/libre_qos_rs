@@ -32,11 +32,10 @@ async fn main() -> Result<()> {
     let (all_sites, all_devices, all_data_links) = pre_load_uisp().await?;
     println!("Fetched all uISP data in {:?}", start_fetch.elapsed());
 
-    let mut network_sites = topology::build_site_list(&all_sites).await?;
-    let clients = clients::build_clients(&all_sites, &all_devices, &all_data_links).await?;
-    println!("Found {} clients", clients.len());
+    let mut network_sites = topology::build_site_list(&all_sites, &all_devices, &all_data_links)?;
+    let clients = clients::build_clients(&all_sites, &all_devices, &all_data_links)?;
     write_shaper_csv(&clients)?;
-    let network_map = build_topology(&clients, &mut network_sites).await?;
+    let network_map = build_topology(&clients, &mut network_sites)?;
     let network_json_data = NetworkNode::from_lq_site(&network_map);
     network_json_data.write_to_file()?;
 

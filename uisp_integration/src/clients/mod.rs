@@ -7,7 +7,7 @@ use crate::unms::{DataLink, Device, Site};
 use anyhow::Result;
 pub use csv::*;
 
-pub async fn build_clients(
+pub fn build_clients(
     all_sites: &[Site],
     all_devices: &[Device],
     all_data_links: &[DataLink],
@@ -42,17 +42,14 @@ pub async fn build_clients(
             .filter_map(|c| c.as_lq_client_device(client_site.upload, client_site.download))
             .collect();
         for device in devices.iter_mut() {
-            lookup_data_link(device, all_data_links).await?;
+            lookup_data_link(device, all_data_links)?;
         }
         client_site.devices = devices;
     }
     Ok(active_sites)
 }
 
-pub async fn lookup_data_link(
-    device: &mut LqClientDevice,
-    all_data_links: &[DataLink],
-) -> Result<()> {
+pub fn lookup_data_link(device: &mut LqClientDevice, all_data_links: &[DataLink]) -> Result<()> {
     if !device.access_point_id.is_empty() {
         return Ok(()); // Bail out because it already has an AP
     }

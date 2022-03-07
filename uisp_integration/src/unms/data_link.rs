@@ -5,6 +5,7 @@ use serde::Deserialize;
 pub struct DataLink {
     pub id: String,
     pub from: DataLinkFrom,
+    pub to: DataLinkTo,
 }
 
 #[allow(non_snake_case)]
@@ -24,4 +25,16 @@ pub struct DataLinkDevice {
 pub struct DataLinkDeviceIdentification {
     pub id: String,
     pub name: String,
+}
+
+#[allow(non_snake_case)]
+#[derive(Deserialize, Debug)]
+pub struct DataLinkTo {
+    pub site: Option<DataLinkSite>,
+}
+
+#[allow(non_snake_case)]
+#[derive(Deserialize, Debug)]
+pub struct DataLinkSite {
+    pub identification: DataLinkDeviceIdentification,
 }
