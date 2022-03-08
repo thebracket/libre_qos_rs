@@ -44,10 +44,10 @@ async fn main() -> Result<()> {
     )?;
     clients.extend_from_slice(&complex_clients);
     clients.extend_from_slice(infrastructure);
-    write_shaper_csv(&clients)?;
-    let network_map = build_topology(&clients, &mut network_sites)?;
+    let network_map = build_topology(&mut clients, &mut network_sites)?;
     let network_json_data = NetworkNode::from_lq_site(&network_map);
     network_json_data.write_to_file()?;
+    write_shaper_csv(&clients)?;
 
     // Complete
     println!("Completed topology rebuild in {:?}", start.elapsed());

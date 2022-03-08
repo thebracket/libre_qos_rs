@@ -45,13 +45,13 @@ pub fn build_site_list(all_sites: &[Site]) -> Result<HashMap<String, LqSite>> {
 }
 
 pub fn build_topology(
-    clients: &[LqClientSite],
+    clients: &mut [LqClientSite],
     network_sites: &mut HashMap<String, LqSite>,
 ) -> Result<LqSite> {
     let access_points_csv = load_aps_csv()?;
     let mut parentless = Vec::new();
-    for client in clients.iter() {
-        for cpe in client.devices.iter() {
+    for client in clients.iter_mut() {
+        for cpe in client.devices.iter_mut() {
             let mut no_parent = false;
             if cpe.parent_site_id.is_empty() {
                 no_parent = true;
@@ -86,6 +86,8 @@ pub fn build_topology(
             }
 
             if no_parent {
+                cpe.access_point_id = "noparent".to_string();
+                cpe.access_point_name = "Unparented".to_string();
                 parentless.push(cpe.clone());
             }
         }
