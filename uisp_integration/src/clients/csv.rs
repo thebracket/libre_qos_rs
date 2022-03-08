@@ -34,9 +34,9 @@ pub fn write_shaper_csv(clients: &[LqClientSite]) -> Result<()> {
             let mac = &c.mac;
 
             csv += &format!(
-                "{device_id},{ap},{mac},{hostname},{ipv4},{ipv6},{:.2},{:.2},{},{}\n",
-                dl_mbps as f32 / 4.0,
-                ul_mbps as f32 / 4.0,
+                "{device_id},{ap},{mac},{hostname},{ipv4},{ipv6},{},{},{},{}\n",
+                (dl_mbps as f32 / 4.0).ceil() as u32,
+                (ul_mbps as f32 / 4.0).ceil() as u32,
                 dl_mbps,
                 ul_mbps,
             );
