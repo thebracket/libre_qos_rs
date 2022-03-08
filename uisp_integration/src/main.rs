@@ -34,6 +34,7 @@ async fn main() -> Result<()> {
 
     let mut network_sites = topology::build_site_list(&all_sites)?;
     //let clients = clients::build_clients(&all_sites, &all_devices, &all_data_links)?;
+    let infrastructure = &clients::create_network_infrastructure(&network_sites, &all_devices)?;
     let mut clients = clients::single_entry_clients(&all_sites, &all_devices, &all_data_links)?;
     let complex_clients = clients::complex_clients(
         &all_sites,
@@ -42,6 +43,7 @@ async fn main() -> Result<()> {
         &mut network_sites,
     )?;
     clients.extend_from_slice(&complex_clients);
+    clients.extend_from_slice(infrastructure);
     write_shaper_csv(&clients)?;
     let network_map = build_topology(&clients, &mut network_sites)?;
     let network_json_data = NetworkNode::from_lq_site(&network_map);

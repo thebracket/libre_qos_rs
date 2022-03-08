@@ -207,3 +207,45 @@ pub fn complex_clients(
 
     Ok(result)
 }
+
+pub fn create_network_infrastructure(
+    sites: &HashMap<String, LqSite>,
+    all_devices: &[Device],
+) -> Result<Vec<LqClientSite>> {
+    let mut result = Vec::new();
+
+    for (i, (_, site)) in sites.iter().enumerate() {
+        let mut ls = LqClientSite {
+            id: format!("inf{i}"),
+            name: format!("{}Infrastructure", site.name),
+            download: 1_000_000_000_000,
+            upload: 1_000_000_000_000,
+            devices: Vec::new(),
+        };
+
+        // Find devices in this site
+        let mut devices: Vec<LqClientDevice> = all_devices
+            .iter()
+            .filter(|d| {
+                if let Some(s) = &d.identification.site {
+                    site.id == s.id
+                } else {
+                    false
+                }
+            })
+            .filter_map(|c| c.as_lq_client_device(ls.upload, ls.download))
+            .collect();
+
+        for d in devices.iter_mut() {
+            d.access_point_id = format!("infap{i}");
+            d.access_point_name = format!("{}Infrastructure", site.name);
+            d.parent_site_id = site.id.clone();
+            d.parent_site_name = site.name.clone();
+        }
+
+        ls.devices = devices;
+        result.push(ls);
+    }
+
+    Ok(result)
+}
