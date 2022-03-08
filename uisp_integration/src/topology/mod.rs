@@ -3,7 +3,7 @@ pub use site::*;
 mod access_point;
 pub use access_point::*;
 mod csv;
-use crate::unms::{DataLink, Device, Keys};
+use crate::unms::Keys;
 use crate::{clients::LqClientSite, unms::Site};
 use anyhow::Result;
 pub use csv::*;
@@ -20,15 +20,11 @@ pub fn build_site_tree(sites: &HashMap<String, LqSite>) -> Result<LqSite> {
         .unwrap()
         .1
         .clone();
-    root.take_children(&sites);
+    root.take_children(sites);
     Ok(root)
 }
 
-pub fn build_site_list(
-    all_sites: &[Site],
-    all_devices: &[Device],
-    all_data_links: &[DataLink],
-) -> Result<HashMap<String, LqSite>> {
+pub fn build_site_list(all_sites: &[Site]) -> Result<HashMap<String, LqSite>> {
     let sites_csv = load_sites_csv()?;
     let sites = all_sites
         .iter()
@@ -59,36 +55,34 @@ pub fn build_topology(
             let mut no_parent = false;
             if cpe.parent_site_id.is_empty() {
                 no_parent = true;
-            } else {
-                if let Some(site) = network_sites.get_mut(&cpe.parent_site_id) {
-                    let access_point = if cpe.access_point_name.is_empty() {
-                        format!("{}-NoAP", cpe.parent_site_name.replace(",", "_"))
-                    } else {
-                        cpe.access_point_name.clone()
-                    };
-
-                    if let Some(ap) = site.access_points.get_mut(&access_point) {
-                        ap.clients.push(cpe.clone());
-                    } else {
-                        let (download_mbps, upload_mbps) =
-                            if let Some(ap_info) = access_points_csv.get(&access_point) {
-                                (ap_info.0, ap_info.1)
-                            } else {
-                                (1_000, 1_000)
-                            };
-                        site.access_points.insert(
-                            access_point.clone(),
-                            LqAccessPoint {
-                                name: access_point.clone(),
-                                clients: vec![cpe.clone()],
-                                download_mbps,
-                                upload_mbps,
-                            },
-                        );
-                    }
+            } else if let Some(site) = network_sites.get_mut(&cpe.parent_site_id) {
+                let access_point = if cpe.access_point_name.is_empty() {
+                    format!("{}-NoAP", cpe.parent_site_name.replace(",", "_"))
                 } else {
-                    no_parent = true;
+                    cpe.access_point_name.clone()
+                };
+
+                if let Some(ap) = site.access_points.get_mut(&access_point) {
+                    ap.clients.push(cpe.clone());
+                } else {
+                    let (download_mbps, upload_mbps) =
+                        if let Some(ap_info) = access_points_csv.get(&access_point) {
+                            (ap_info.0, ap_info.1)
+                        } else {
+                            (1_000, 1_000)
+                        };
+                    site.access_points.insert(
+                        access_point.clone(),
+                        LqAccessPoint {
+                            name: access_point.clone(),
+                            clients: vec![cpe.clone()],
+                            download_mbps,
+                            upload_mbps,
+                        },
+                    );
                 }
+            } else {
+                no_parent = true;
             }
 
             if no_parent {
@@ -123,7 +117,7 @@ pub fn build_topology(
     f.write_all(pcsv.as_bytes())?;
 
     // Overall topology
-    let mut network_map = build_site_tree(&network_sites)?;
+    let mut network_map = build_site_tree(network_sites)?;
     network_map.access_points.insert(
         "0".to_string(),
         LqAccessPoint {

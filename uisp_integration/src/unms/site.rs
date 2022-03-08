@@ -28,11 +28,7 @@ impl Site {
             }
 
             let parent: Option<String> = if let Some(parent) = &ident.parent {
-                if let Some(parent) = &parent.id {
-                    Some(parent.clone())
-                } else {
-                    None
-                }
+                parent.id.as_ref().cloned()
             } else {
                 None
             };

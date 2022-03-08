@@ -18,7 +18,7 @@ impl NetworkNode {
         };
 
         for ap in site.access_points.iter() {
-            result.children.push(NetworkNode::from_lq_ap(&ap.1));
+            result.children.push(NetworkNode::from_lq_ap(ap.1));
         }
 
         for cs in site.children.iter() {
@@ -82,7 +82,7 @@ impl NetworkNode {
         }
 
         if base == 0 {
-            js += &pad_line_add_eol(base + 0, "}");
+            js += &pad_line_add_eol(base, "}");
         }
         js
     }

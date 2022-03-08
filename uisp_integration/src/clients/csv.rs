@@ -2,8 +2,8 @@ use super::LqClientSite;
 use anyhow::Result;
 
 fn strip_ip(ip: &str) -> String {
-    if ip.contains("/") {
-        ip.split("/").nth(0).unwrap().to_string()
+    if ip.contains('/') {
+        ip.split('/').next().unwrap().to_string()
     } else {
         ip.to_string()
     }
@@ -36,7 +36,7 @@ pub fn write_shaper_csv(clients: &[LqClientSite]) -> Result<()> {
             csv += &format!(
                 "{device_id},{ap},{mac},{hostname},{ipv4},{ipv6},{:.2},{:.2},{},{}\n",
                 dl_mbps as f32 / 4.0,
-                ul_mbps as f32/ 4.0,
+                ul_mbps as f32 / 4.0,
                 dl_mbps,
                 ul_mbps,
             );

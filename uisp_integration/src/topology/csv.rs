@@ -8,9 +8,9 @@ pub fn load_sites_csv() -> Result<HashMap<String, (usize, usize)>> {
         let mut data = String::new();
         let mut f = File::open(path)?;
         f.read_to_string(&mut data)?;
-        data.split("\n").skip(1).for_each(|line| {
+        data.split('\n').skip(1).for_each(|line| {
             if !line.trim().is_empty() {
-                let cols = line.split(",").collect::<Vec<&str>>();
+                let cols = line.split(',').collect::<Vec<&str>>();
                 let name = cols[0].trim();
                 let download = cols[1].trim();
                 let upload = cols[2].trim();
@@ -36,9 +36,9 @@ pub fn load_aps_csv() -> Result<HashMap<String, (usize, usize)>> {
         let mut data = String::new();
         let mut f = File::open(path)?;
         f.read_to_string(&mut data)?;
-        data.split("\n").skip(1).for_each(|line| {
+        data.split('\n').skip(1).for_each(|line| {
             if !line.trim().is_empty() {
-                let cols = line.split(",").collect::<Vec<&str>>();
+                let cols = line.split(',').collect::<Vec<&str>>();
                 let name = cols[0].trim();
                 let download = cols[1].trim();
                 let upload = cols[2].trim();

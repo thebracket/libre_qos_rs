@@ -103,9 +103,9 @@ impl Device {
             result = Some(LqClientDevice {
                 id: self.identification.id.clone(),
                 hostname,
-                mac: self.identification.mac.clone().unwrap_or(String::new()),
+                mac: self.identification.mac.clone().unwrap_or_default(),
                 ip: ip.clone(),
-                model: self.identification.model.clone().unwrap_or(String::new()),
+                model: self.identification.model.clone().unwrap_or_default(),
                 access_point_id,
                 access_point_name,
                 parent_site_id,

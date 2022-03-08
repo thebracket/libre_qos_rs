@@ -20,7 +20,7 @@ impl Keys {
 
         let f = File::open("keys.ron").unwrap();
         let mut keys: Self = from_reader(f)?;
-        if keys.nms_url.ends_with("/") {
+        if keys.nms_url.ends_with('/') {
             keys.nms_url = format!("{}nms/api/v2.1", keys.nms_url);
         } else {
             keys.nms_url = format!("{}/nms/api/v2.1", keys.nms_url);

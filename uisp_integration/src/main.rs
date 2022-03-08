@@ -32,7 +32,7 @@ async fn main() -> Result<()> {
     let (all_sites, all_devices, all_data_links) = pre_load_uisp().await?;
     println!("Fetched all uISP data in {:?}", start_fetch.elapsed());
 
-    let mut network_sites = topology::build_site_list(&all_sites, &all_devices, &all_data_links)?;
+    let mut network_sites = topology::build_site_list(&all_sites)?;
     //let clients = clients::build_clients(&all_sites, &all_devices, &all_data_links)?;
     let mut clients = clients::single_entry_clients(&all_sites, &all_devices, &all_data_links)?;
     let complex_clients = clients::complex_clients(
